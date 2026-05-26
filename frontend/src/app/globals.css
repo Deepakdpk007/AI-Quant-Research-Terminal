@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #05070d;
+  color: #e6ebf5;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0e16;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2233;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #252b3d;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-md border border-border bg-bg-panel;
+  }
+  .panel-header {
+    @apply flex items-center justify-between border-b border-border px-3 py-2 text-2xs uppercase tracking-[0.18em] text-text-muted;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 rounded border border-border px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wider;
+  }
+  .pill-bull {
+    @apply border-bias-bull/40 bg-bias-bull/10 text-bias-bull;
+  }
+  .pill-bear {
+    @apply border-bias-bear/40 bg-bias-bear/10 text-bias-bear;
+  }
+  .pill-neutral {
+    @apply border-bias-neutral/40 bg-bias-neutral/10 text-bias-neutral;
+  }
+  .grid-line {
+    background-image: linear-gradient(to right, rgba(28, 34, 51, 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(28, 34, 51, 0.4) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .ring-glow {
+    box-shadow: 0 0 0 1px rgba(0, 211, 255, 0.18), 0 0 24px rgba(0, 211, 255, 0.12);
+  }
+}
+
+/* SVG line dash for radar */
+.radar-stroke {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: radar-draw 0.9s ease-out forwards;
+}
+@keyframes radar-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.scanline {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 211, 255, 0) 0px,
+    rgba(0, 211, 255, 0) 2px,
+    rgba(0, 211, 255, 0.04) 3px,
+    rgba(0, 211, 255, 0) 4px
+  );
+}
