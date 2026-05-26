@@ -60,9 +60,21 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Codespaces / Gitpod / generic dev: also allow forwarded host patterns
+    # so that the browser-resolved frontend URL can reach the backend without
+    # users having to manually edit CORS lists.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
+        allow_origin_regex=(
+            r"^https?://("
+            r"localhost(:\d+)?|"
+            r"127\.0\.0\.1(:\d+)?|"
+            r"[a-z0-9-]+-\d+\.app\.github\.dev|"
+            r"[a-z0-9-]+\.github\.dev|"
+            r"\d+-[a-z0-9-]+\.gitpod\.io"
+            r")$"
+        ),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

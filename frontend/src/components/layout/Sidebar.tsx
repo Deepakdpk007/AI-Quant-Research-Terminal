@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { Quote } from '@/lib/types';
 import { cn, formatPct } from '@/lib/utils';
@@ -41,49 +43,91 @@ export function Sidebar({ active, onSelect }: Props) {
   }, []);
 
   return (
-    <aside className="flex w-56 flex-col border-r border-border bg-bg-panel">
-      <div className="panel-header">Watchlist</div>
-      <div className="flex-1 overflow-y-auto py-1">
-        {loading && <div className="px-3 py-2 text-2xs text-text-dim">Loading...</div>}
-        {universe.map((sym) => {
-          const q = quotes[sym];
-          const isActive = sym === active;
-          const change = q?.change_pct ?? 0;
-          return (
-            <button
-              key={sym}
-              onClick={() => onSelect(sym)}
-              className={cn(
-                'group flex w-full items-center justify-between border-l-2 px-3 py-2 text-left transition-colors',
-                isActive
-                  ? 'border-accent-cyan bg-accent-cyan/5 text-text'
-                  : 'border-transparent text-text-muted hover:border-border-strong hover:bg-bg-hover',
-              )}
-            >
-              <div>
-                <div className="font-mono text-sm">{sym}</div>
-                <div className="text-2xs text-text-dim">{q?.exchange ?? '...'}</div>
-              </div>
-              <div className="text-right font-mono text-2xs">
-                <div className={cn('tabular-nums', isActive ? 'text-text' : 'text-text-muted')}>
-                  {q ? q.price.toFixed(2) : '...'}
-                </div>
-                <div
-                  className={cn(
-                    'tabular-nums',
-                    change > 0 ? 'text-bias-bull' : change < 0 ? 'text-bias-bear' : 'text-text-dim',
-                  )}
-                >
-                  {q ? formatPct(change) : ''}
-                </div>
-              </div>
-            </button>
-          );
-        })}
+    <aside className="flex w-60 shrink-0 flex-col border-r border-white/[0.04] bg-bg-deep/30 backdrop-blur-md">
+      <div className="flex h-10 items-center justify-between border-b border-white/[0.04] px-4">
+        <span className="font-mono text-2xs uppercase tracking-[0.22em] text-text-dim">
+          watchlist
+        </span>
+        <span className="rounded-md bg-white/[0.04] px-1.5 py-0.5 font-mono text-2xs text-text-muted">
+          {universe.length}
+        </span>
       </div>
-      <div className="border-t border-border p-3 text-2xs leading-relaxed text-text-dim">
-        <div className="mb-1 font-medium uppercase tracking-[0.18em] text-text-muted">
-          Disclaimer
+      <div className="flex-1 overflow-y-auto px-2 py-2">
+        {loading && (
+          <div className="space-y-1.5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="skeleton h-12 w-full" />
+            ))}
+          </div>
+        )}
+        {!loading &&
+          universe.map((sym, idx) => {
+            const q = quotes[sym];
+            const isActive = sym === active;
+            const change = q?.change_pct ?? 0;
+            return (
+              <motion.button
+                key={sym}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.03 }}
+                onClick={() => onSelect(sym)}
+                className={cn(
+                  'group relative flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all',
+                  isActive
+                    ? 'bg-gradient-to-r from-accent-cyan/10 to-transparent shadow-[inset_2px_0_0_0_#22d3ee]'
+                    : 'hover:bg-white/[0.03]',
+                )}
+              >
+                <div className="min-w-0">
+                  <div
+                    className={cn(
+                      'font-display text-sm font-medium',
+                      isActive ? 'text-text' : 'text-text-muted group-hover:text-text',
+                    )}
+                  >
+                    {sym}
+                  </div>
+                  <div className="text-2xs text-text-dim/70">{q?.exchange ?? '...'}</div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div
+                    className={cn(
+                      'font-mono text-2xs tabular',
+                      isActive ? 'text-text' : 'text-text-muted',
+                    )}
+                  >
+                    {q ? q.price.toFixed(2) : '...'}
+                  </div>
+                  <div
+                    className={cn(
+                      'flex items-center gap-0.5 font-mono text-2xs tabular',
+                      change > 0
+                        ? 'text-bias-bull'
+                        : change < 0
+                          ? 'text-bias-bear'
+                          : 'text-text-dim',
+                    )}
+                  >
+                    {change > 0 ? (
+                      <TrendingUp className="h-2.5 w-2.5" />
+                    ) : change < 0 ? (
+                      <TrendingDown className="h-2.5 w-2.5" />
+                    ) : null}
+                    {q ? formatPct(change) : ''}
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
+      </div>
+
+      <div className="border-t border-white/[0.04] p-3 text-2xs leading-relaxed text-text-dim/80">
+        <div className="mb-1 flex items-center gap-1.5">
+          <div className="h-1 w-1 rounded-full bg-accent-amber" />
+          <span className="font-medium uppercase tracking-[0.18em] text-text-muted">
+            Disclaimer
+          </span>
         </div>
         Educational use only. Outputs may be derived from synthetic data when in mock mode. Not
         financial advice.

@@ -14,7 +14,7 @@ interface Health {
 export function StatusBar() {
   const [health, setHealth] = useState<Health | null>(null);
   const [now, setNow] = useState(new Date());
-  const [streamingSymbol, setStreamingSymbol] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -23,7 +23,7 @@ export function StatusBar() {
         const h = await api.health();
         if (mounted) setHealth(h);
       } catch {
-        /* offline */
+        if (mounted) setHealth(null);
       }
     };
     void load();
@@ -31,7 +31,7 @@ export function StatusBar() {
     const tick = setInterval(() => setNow(new Date()), 1_000);
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<{ symbol: string | null }>).detail;
-      setStreamingSymbol(detail?.symbol ?? null);
+      setStreaming(detail?.symbol ?? null);
     };
     window.addEventListener('aiqrt:streaming', handler as EventListener);
     return () => {
@@ -42,21 +42,53 @@ export function StatusBar() {
     };
   }, []);
 
+  const ok = health !== null;
+
   return (
-    <footer className="flex items-center gap-3 border-t border-border bg-bg-panel px-4 py-1 text-2xs uppercase tracking-[0.18em] text-text-dim">
-      <span className={cn(health ? 'text-bias-bull' : 'text-bias-bear')}>
-        ● {health ? 'OK' : 'DISCONNECTED'}
+    <footer className="flex h-7 items-center gap-3 border-t border-white/[0.04] bg-bg-deep/60 px-4 font-mono text-2xs uppercase tracking-[0.18em] text-text-dim backdrop-blur-md">
+      <span className="flex items-center gap-1.5">
+        <span className={cn('status-dot', ok ? 'text-bias-bull' : 'text-bias-bear')} />
+        {ok ? 'Online' : 'Disconnected'}
       </span>
+      <Sep />
       <span>v{health?.version ?? '?'}</span>
-      <span>mode: {health?.mode ?? '?'}</span>
-      <span>llm: {health?.services?.llm ?? '?'}</span>
-      <span>market: {health?.services?.market ?? '?'}</span>
-      <span>cache: {health?.services?.redis ?? '?'}</span>
-      <span>rag: {health?.services?.rag ?? '?'}</span>
-      {streamingSymbol && <span className="text-accent-cyan">streaming {streamingSymbol}...</span>}
-      <span className="ml-auto font-mono normal-case">
+      <Sep />
+      <span>
+        mode <span className="text-text">{health?.mode ?? '?'}</span>
+      </span>
+      <Sep />
+      <Service name="llm" value={health?.services?.llm} />
+      <Service name="market" value={health?.services?.market} />
+      <Service name="cache" value={health?.services?.redis} />
+      <Service name="rag" value={health?.services?.rag} />
+      {streaming && (
+        <span className="ml-2 flex items-center gap-1.5 text-accent-cyan">
+          <span className="status-dot text-accent-cyan" />
+          streaming {streaming}
+        </span>
+      )}
+      <span className="ml-auto normal-case tracking-normal text-text-muted">
         {now.toISOString().slice(0, 19).replace('T', ' ')} UTC
       </span>
     </footer>
+  );
+}
+
+function Sep() {
+  return <span className="text-text-dim/30">·</span>;
+}
+
+function Service({ name, value }: { name: string; value?: string }) {
+  return (
+    <span>
+      {name}{' '}
+      <span
+        className={cn(
+          value === 'real' ? 'text-bias-bull' : value === 'mock' ? 'text-accent-cyan' : 'text-text-muted',
+        )}
+      >
+        {value ?? '?'}
+      </span>
+    </span>
   );
 }
