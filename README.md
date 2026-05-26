@@ -9,6 +9,23 @@
 
 ---
 
+## ⚡ One-click run (no install, no terminal commands)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Deepakdpk007/AI-Quant-Research-Terminal?quickstart=1)
+
+Click the badge above. After ~90 seconds:
+
+1. A VS Code editor opens in your browser
+2. The setup script auto-installs Python + Node deps
+3. Backend (port 8000) and frontend (port 3000) auto-start
+4. A toast pops up: **"Your application running on port 3000 is available."** Click **Open in Browser**.
+
+Done. The terminal opens in a new tab with all features working in mock mode.
+
+If the toast doesn't appear, click the **PORTS** tab at the bottom of VS Code and click the 🌐 globe icon next to port `3000`.
+
+---
+
 ## Why this exists
 
 Most "AI finance" projects are dashboards or single-prompt chatbots. This is
